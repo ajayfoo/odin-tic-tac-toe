@@ -10,9 +10,6 @@ const GameBoard = (() => {
     const reset = () => {
         gameState = new Array(3).fill(new Array(3).fill(null, 0, 3), 0, 3);
     };
-    const print = () => {
-        console.log(gameState);
-    };
-
-    return { setXO, reset, print };
+    const getCopyOfGameState = () => gameState.map(row => row.slice());
+    return { setXO, reset, getCopyOfGameState };
 })();
