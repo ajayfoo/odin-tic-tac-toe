@@ -1,19 +1,29 @@
 const GameBoard = (() => {
-    let gameState = [
-        [null, null, null],
-        [null, null, null],
-        [null, null, null],
-    ];
+    let gameState = null;
     const X = 'X';
     const O = 'O';
     const setXO = (setX, row, col) => {
         gameState[row][col] = setX ? X : O;
     };
-    const reset = () => {
+    const setupNewGameState = () => {
         gameState = Array.from({ length: 3 }, () => Array.from({ length: 3 }, () => null));
     };
     const getCopyOfGameState = () => gameState.map(row => row.slice());
-    return { setXO, reset, getCopyOfGameState, X, O };
+    const print = () => {
+        console.log('\t0\t1\t2')
+        for (let i = 0; i < 3; ++i) {
+            let row = i + '\t';
+            for (let j = 0; j < 3; ++j) {
+                if (gameState[i][j] === null) {
+                    row += '\t ';
+                } else {
+                    row += gameState[i][j] + '\t';
+                }
+            }
+            console.log(row);
+        }
+    }
+    return { setXO, setupNewGameState, getCopyOfGameState, X, O, print };
 })();
 
 const GameController = (() => {
@@ -66,6 +76,27 @@ const GameController = (() => {
         }
         return false;
     };
+    const xHasWon = () => rowWin(true) || colWin(true) || diagonalWin(true);
+    const oHasWon = () => rowWin(false) || colWin(false) || diagonalWin(false);
+
     const diagonalWin = (checkForX) => (leftDiagonalWin(checkForX) || rightDiagonalWin(checkForX));
-    return { rowWin, colWin, diagonalWin };
+    const startGame = () => {
+        GameBoard.setupNewGameState();
+        let player1sTurn = true;
+        console.log(xHasWon() + ' ' + oHasWon());
+        while (!(xHasWon() || oHasWon())) {
+            GameBoard.print();
+            let rowNum = prompt('Enter row number');
+            let colNum = prompt('Enter column number');
+            GameBoard.setXO(player1sTurn, rowNum, colNum);
+            player1sTurn = !player1sTurn;
+        }
+        GameBoard.print();
+        if (!player1sTurn) {
+            console.log('Player 1 has won');
+        } else {
+            console.log('Player 2 has won');
+        }
+    };
+    return { startGame };
 })();
