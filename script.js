@@ -38,7 +38,12 @@ const ScoreChart = (() => {
     const getPlayer2Wins = () => player2Wins;
     const incrementPlayer1Wins = () => { ++player1Wins; };
     const incrementPlayer2Wins = () => { ++player2Wins };
-    return { getPlayer1Wins, getPlayer2Wins, incrementPlayer1Wins, incrementPlayer2Wins };
+    const reset = () => {
+        player1Wins = 0;
+        player2Wins = 0;
+    };
+    const print = () => { console.log(`Player 1: ${getPlayer1Wins()}, Player 2: ${getPlayer2Wins()}`) };
+    return { getPlayer1Wins, getPlayer2Wins, incrementPlayer1Wins, incrementPlayer2Wins, reset, print };
 })();
 
 const GameController = (() => {
@@ -98,6 +103,8 @@ const GameController = (() => {
 
     const diagonalWin = (checkForX) => (leftDiagonalWin(checkForX) || rightDiagonalWin(checkForX));
     const startGame = () => {
+        ScoreChart.reset();
+        console.log('Starting a new game');
         let roundNum = 1;
         while (ScoreChart.getPlayer1Wins() < 3 && ScoreChart.getPlayer2Wins() < 3 && roundNum <= 3) {
             GameBoard.setupNewGameState();
@@ -127,13 +134,14 @@ const GameController = (() => {
             }
             ++roundNum;
         }
-        if (ScoreChart.getPlayer1Wins() === 3) {
+        if (ScoreChart.getPlayer1Wins() > ScoreChart.getPlayer2Wins()) {
             console.log('Player 1 has won the game');
-        } else if (ScoreChart.getPlayer1Wins() === 3) {
+        } else if (ScoreChart.getPlayer1Wins() < ScoreChart.getPlayer2Wins()) {
             console.log('Player 2 has won the game');
         } else {
             console.log("It's a tie");
         }
+        ScoreChart.print();
     };
     return { startGame };
 })();
