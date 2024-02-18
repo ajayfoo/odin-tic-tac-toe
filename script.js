@@ -3,7 +3,12 @@ const GameBoard = (() => {
     const X = 'X';
     const O = 'O';
     const setXO = (setX, row, col) => {
+        const maxRow = gameState.length - 1;
+        const maxCol = maxRow;
+        if (row > maxRow || row < 0 || col > maxCol || col < 0) return false;
+        if (gameState[row][col] !== null) return false;
         gameState[row][col] = setX ? X : O;
+        return true;
     };
     const setupNewGameState = () => {
         gameState = Array.from({ length: 3 }, () => Array.from({ length: 3 }, () => null));
@@ -15,7 +20,7 @@ const GameBoard = (() => {
             let row = i + '\t';
             for (let j = 0; j < 3; ++j) {
                 if (gameState[i][j] === null) {
-                    row += '\t ';
+                    row += '\t';
                 } else {
                     row += gameState[i][j] + '\t';
                 }
@@ -24,6 +29,16 @@ const GameBoard = (() => {
         }
     }
     return { setXO, setupNewGameState, getCopyOfGameState, X, O, print };
+})();
+
+const ScoreChart = (() => {
+    let player1Wins = 0;
+    let player2Wins = 0;
+    const getPlayer1Wins = () => player1Wins;
+    const getPlayer2Wins = () => player2Wins;
+    const incrementPlayer1Wins = () => { ++player1Wins; };
+    const incrementPlayer2Wins = () => { ++player2Wins };
+    return { getPlayer1Wins, getPlayer2Wins, incrementPlayer1Wins, incrementPlayer2Wins };
 })();
 
 const GameController = (() => {
@@ -76,26 +91,48 @@ const GameController = (() => {
         }
         return false;
     };
-    const xHasWon = () => rowWin(true) || colWin(true) || diagonalWin(true);
-    const oHasWon = () => rowWin(false) || colWin(false) || diagonalWin(false);
+    const hasWon = (piece) => {
+        const checkForX = piece === GameBoard.X;
+        return rowWin(checkForX) || colWin(checkForX) || diagonalWin(checkForX)
+    };
 
     const diagonalWin = (checkForX) => (leftDiagonalWin(checkForX) || rightDiagonalWin(checkForX));
     const startGame = () => {
-        GameBoard.setupNewGameState();
-        let player1sTurn = true;
-        console.log(xHasWon() + ' ' + oHasWon());
-        while (!(xHasWon() || oHasWon())) {
+        let roundNum = 1;
+        while (ScoreChart.getPlayer1Wins() < 3 && ScoreChart.getPlayer2Wins() < 3 && roundNum <= 3) {
+            GameBoard.setupNewGameState();
+            let player1sTurn = true;
+            while (!(hasWon(GameBoard.X) || hasWon(GameBoard.O))) {
+                GameBoard.print();
+                if (player1sTurn) {
+                    console.log("Player 1's turn");
+                } else {
+                    console.log("Player 2's turn");
+                }
+                let rowNum = prompt('Enter row number(0 to 2)');
+                let colNum = prompt('Enter column number(0 to 2)');
+                if (!GameBoard.setXO(player1sTurn, rowNum, colNum)) {
+                    console.log('Please enter valid row and column number. Place only on empty cells.');
+                    continue;
+                }
+                player1sTurn = !player1sTurn;
+            }
             GameBoard.print();
-            let rowNum = prompt('Enter row number');
-            let colNum = prompt('Enter column number');
-            GameBoard.setXO(player1sTurn, rowNum, colNum);
-            player1sTurn = !player1sTurn;
+            if (!player1sTurn) {
+                console.log('Player 1 has won round ' + roundNum);
+                ScoreChart.incrementPlayer1Wins();
+            } else {
+                console.log('Player 2 has won round ' + roundNum);
+                ScoreChart.incrementPlayer2Wins();
+            }
+            ++roundNum;
         }
-        GameBoard.print();
-        if (!player1sTurn) {
-            console.log('Player 1 has won');
+        if (ScoreChart.getPlayer1Wins() === 3) {
+            console.log('Player 1 has won the game');
+        } else if (ScoreChart.getPlayer1Wins() === 3) {
+            console.log('Player 2 has won the game');
         } else {
-            console.log('Player 2 has won');
+            console.log("It's a tie");
         }
     };
     return { startGame };
