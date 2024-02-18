@@ -106,9 +106,9 @@ const GameController = (() => {
         ScoreChart.reset();
         console.log('Starting a new game');
         let roundNum = 1;
+        let player1sTurn = true;
         while (ScoreChart.getPlayer1Wins() < 3 && ScoreChart.getPlayer2Wins() < 3 && roundNum <= 3) {
             GameBoard.setupNewGameState();
-            let player1sTurn = true;
             while (!(hasWon(GameBoard.X) || hasWon(GameBoard.O))) {
                 GameBoard.print();
                 if (player1sTurn) {
