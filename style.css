@@ -12,6 +12,8 @@ html {
 
 header>h1 {
     text-align: center;
+    font-size: 2.2rem;
+    margin: 0.3em auto 0.5em;
 }
 
 .game-board {
@@ -28,4 +30,68 @@ header>h1 {
 
 .cell {
     background-color: rgb(242 190 252);
+}
+
+.score-board {
+    display: grid;
+    grid-template-columns: repeat(3, max-content);
+    justify-content: center;
+    justify-items: center;
+}
+
+.score-board>*>button {
+    font-size: 2rem;
+    border: none;
+    align-items: center;
+    border-radius: inherit;
+    box-shadow: inherit;
+}
+
+.x-score,
+.o-score {
+    border-radius: 5px;
+    padding: 0.3rem 0.7rem;
+    box-shadow: 2px 2px 5px rgb(0 0 0 / 0.3);
+    background-color: rgb(204, 221, 226);
+}
+
+.x-score>button {
+    margin-right: 2em;
+}
+
+.o-score>button {
+    margin-left: 2em;
+}
+
+.score-board>*>output {
+    font-size: 2rem;
+}
+
+.colon {
+    font-size: 2rem;
+    margin: 0 0.3em;
+}
+
+#restart {
+    margin-left: 1em;
+    font-size: 1.5rem;
+    background-color: rgb(182 23 75);
+    color: rgb(239 239 239);
+    border: none;
+    box-shadow: 2px 2px 5px rgb(0 0 0 / 0.3);
+    padding: 0.3em 0.7em;
+    border-radius: 5px;
+}
+
+.controls {
+    display: flex;
+    margin: 1rem 0;
+    align-items: center;
+    justify-content: center;
+}
+
+.final-result {
+    text-align: center;
+    font-size: 1.2rem;
+    margin: 1rem auto;
 }
