@@ -19,8 +19,8 @@ header>h1 {
 .game-board {
     display: grid;
     width: min-content;
-    grid-template-columns: repeat(3, 150px);
-    grid-template-rows: repeat(3, 150px);
+    grid-template-columns: repeat(3, 100px);
+    grid-template-rows: repeat(3, 100px);
     gap: 15px;
     justify-content: center;
     margin: 0 auto;
@@ -30,6 +30,10 @@ header>h1 {
 
 .cell {
     background-color: rgb(242 190 252);
+}
+
+.cell>img {
+    width: 100%;
 }
 
 .score-board {

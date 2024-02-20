@@ -37,7 +37,7 @@ const ScoreChart = (() => {
     const getPlayer1Wins = () => player1Wins;
     const getPlayer2Wins = () => player2Wins;
     const incrementPlayer1Wins = () => { ++player1Wins; };
-    const incrementPlayer2Wins = () => { ++player2Wins };
+    const incrementPlayer2Wins = () => { ++player2Wins; };
     const reset = () => {
         player1Wins = 0;
         player2Wins = 0;
@@ -145,3 +145,33 @@ const GameController = (() => {
     };
     return { startGame };
 })();
+
+const GameBoardView = (() => {
+    const setCellImage = (isX, cellImage) => {
+        if (isX) {
+            cellImage.alt = 'X';
+            cellImage.src = 'images/line-md--close.svg';
+        } else {
+            cellImage.alt = 'O';
+            cellImage.src = 'images/mdi--circle-outline.svg';
+        }
+    };
+    const populate = () => {
+        GameBoard.setupNewGameState();
+        GameBoard.setXO(true, 0, 0);
+        const gameState = GameBoard.getCopyOfGameState();
+        const gameBoardElement = document.querySelector('.game-board');
+        const cells = gameBoardElement.querySelectorAll('.cell');
+        let cellIndex = 0;
+        for (let i = 0; i < gameState.length; ++i) {
+            for (let j = 0; j < gameState.length; ++j, ++cellIndex) {
+                const isX = gameState[i][j] === 'X';
+                const cellImage = cells[cellIndex].querySelector('img');
+                setCellImage(isX, cellImage);
+            }
+        }
+    };
+    return { populate };
+})();
+
+GameBoardView.populate();
