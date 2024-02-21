@@ -150,7 +150,6 @@ const GameController = (() => {
     const setHaltGame = (halt) => { haltGame = halt; };
     const attachEventListenersForEveryCell = () => {
         let isXPlayersTurn = true;
-        const finalResult = document.querySelector('body>div.final-result');
         let xScore = 0;
         let oScore = 0;
         cells.forEach((cell) => {
@@ -191,6 +190,7 @@ const GameController = (() => {
                     xScore = 0;
                     oScore = 0;
                     isXPlayersTurn = true;
+                    finalResult.classList.add('final');
                     return;
                 }
             });
@@ -208,6 +208,7 @@ const nextRoundBtn = document.getElementById('next-round');
 const restartBtn = document.getElementById('restart');
 const xScoreTxt = document.querySelector("body > div.controls > span > span.x-score > output");
 const oScoreTxt = document.querySelector("body > div.controls > span > span.o-score > output");
+const finalResult = document.querySelector('body>div.final-result');
 
 nextRoundBtn.addEventListener('click', () => {
     GameController.setHaltGame(false);
@@ -222,5 +223,6 @@ restartBtn.addEventListener('click', () => {
     nextRoundBtn.disabled = false;
     xScoreTxt.textContent = 0;
     oScoreTxt.textContent = 0;
+    finalResult.classList.remove('final');
 });
 GameController.startGame();
