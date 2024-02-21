@@ -150,8 +150,6 @@ const GameController = (() => {
     const setHaltGame = (halt) => { haltGame = halt; };
     const attachEventListenersForEveryCell = () => {
         let isXPlayersTurn = true;
-        const xScoreTxt = document.querySelector("body > div.controls > span > span.x-score > output");
-        const oScoreTxt = document.querySelector("body > div.controls > span > span.o-score > output");
         const finalResult = document.querySelector('body>div.final-result');
         let xScore = 0;
         let oScore = 0;
@@ -181,6 +179,7 @@ const GameController = (() => {
                 }
                 if (numOfCompletedRounds === 3) {
                     nextRoundBtn.disabled = true;
+                    numOfCompletedRounds = 0;
                     if (xScore > oScore) {
                         finalResult.textContent = 'X has won the game';
                     } else if (oScore > xScore) {
@@ -189,6 +188,9 @@ const GameController = (() => {
                     else {
                         finalResult.textContent = 'The game was a tie!';
                     }
+                    xScore = 0;
+                    oScore = 0;
+                    isXPlayersTurn = true;
                     return;
                 }
             });
@@ -203,9 +205,22 @@ const GameController = (() => {
     return { startGame, setHaltGame };
 })();
 const nextRoundBtn = document.getElementById('next-round');
+const restartBtn = document.getElementById('restart');
+const xScoreTxt = document.querySelector("body > div.controls > span > span.x-score > output");
+const oScoreTxt = document.querySelector("body > div.controls > span > span.o-score > output");
+
 nextRoundBtn.addEventListener('click', () => {
     GameController.setHaltGame(false);
     GameBoardView.reset();
     GameBoard.setupNewGameState();
+});
+restartBtn.addEventListener('click', () => {
+    ScoreChart.reset();
+    GameBoardView.reset();
+    GameBoard.setupNewGameState();
+    GameController.setHaltGame(false);
+    nextRoundBtn.disabled = false;
+    xScoreTxt.textContent = 0;
+    oScoreTxt.textContent = 0;
 });
 GameController.startGame();
