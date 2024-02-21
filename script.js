@@ -144,6 +144,8 @@ const GameController = (() => {
     const gameBoardElement = document.querySelector('.game-board');
     const cells = gameBoardElement.querySelectorAll('.cell');
     const diagonalWin = (checkForX) => (leftDiagonalWin(checkForX) || rightDiagonalWin(checkForX));
+    let haltGame = false;
+    const setHaltGame = (halt) => { haltGame = halt; };
     const attachEventListenersForEveryCell = () => {
         let isXPlayersTurn = true;
         const xScoreTxt = document.querySelector("body > div.controls > span > span.x-score > output");
@@ -154,24 +156,25 @@ const GameController = (() => {
         cells.forEach((cell) => {
             cell.addEventListener('click', () => {
                 const { rowNum, colNum } = GameBoardView.indexToRowNumColNum(cell.dataset.index);
-                if (GameBoard.getCellState(rowNum, colNum) !== null) return;
+                if (GameBoard.getCellState(rowNum, colNum) !== null || haltGame) return;
                 GameBoard.setXO(isXPlayersTurn, rowNum, colNum);
                 GameBoardView.setCellImage(isXPlayersTurn, cell);
+                const xWon = hasWon(GameBoard.X);
+                const oWon = hasWon(GameBoard.O);
                 if (hasWon(GameBoard.X)) {
                     xScoreTxt.textContent = ++xScore;
+                    finalResult.textContent = 'Last round was a won by X';
                 }
                 else if (hasWon(GameBoard.O)) {
                     oScoreTxt.textContent = ++oScore;
-                }
-                if (hasWon(GameBoard.X) || hasWon(GameBoard.O) || GameBoard.allCellsAreMarked()) {
-                    GameBoardView.reset();
-                    GameBoard.setupNewGameState();
+                    finalResult.textContent = 'Last round was a won by O';
                 }
                 if (GameBoard.allCellsAreMarked()) {
                     console.log('all marked');
                     finalResult.textContent = 'Last round was a tie';
                 }
                 isXPlayersTurn = !isXPlayersTurn;
+                haltGame = xWon || oWon || GameBoard.allCellsAreMarked();
             });
         });
     };
@@ -181,7 +184,12 @@ const GameController = (() => {
         attachEventListenersForEveryCell();
         console.log('Starting a new game');
     };
-    return { startGame };
+    return { startGame, setHaltGame };
 })();
-
+const nextRoundBtn = document.getElementById('next-round');
+nextRoundBtn.addEventListener('click', () => {
+    GameController.setHaltGame(false);
+    GameBoardView.reset();
+    GameBoard.setupNewGameState();
+});
 GameController.startGame();
