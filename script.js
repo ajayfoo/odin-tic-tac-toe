@@ -145,6 +145,8 @@ const GameController = (() => {
     const cells = gameBoardElement.querySelectorAll('.cell');
     const diagonalWin = (checkForX) => (leftDiagonalWin(checkForX) || rightDiagonalWin(checkForX));
     let haltGame = false;
+    let numOfCompletedRounds = 0;
+    const getNumOfRoundsCompleted = () => numOfCompletedRounds;
     const setHaltGame = (halt) => { haltGame = halt; };
     const attachEventListenersForEveryCell = () => {
         let isXPlayersTurn = true;
@@ -161,20 +163,34 @@ const GameController = (() => {
                 GameBoardView.setCellImage(isXPlayersTurn, cell);
                 const xWon = hasWon(GameBoard.X);
                 const oWon = hasWon(GameBoard.O);
-                if (hasWon(GameBoard.X)) {
+                if (xWon) {
                     xScoreTxt.textContent = ++xScore;
                     finalResult.textContent = 'Last round was a won by X';
                 }
-                else if (hasWon(GameBoard.O)) {
+                else if (oWon) {
                     oScoreTxt.textContent = ++oScore;
                     finalResult.textContent = 'Last round was a won by O';
                 }
                 if (GameBoard.allCellsAreMarked()) {
-                    console.log('all marked');
                     finalResult.textContent = 'Last round was a tie';
                 }
                 isXPlayersTurn = !isXPlayersTurn;
-                haltGame = xWon || oWon || GameBoard.allCellsAreMarked();
+                if (xWon || oWon || GameBoard.allCellsAreMarked()) {
+                    ++numOfCompletedRounds;
+                    haltGame = true;
+                }
+                if (numOfCompletedRounds === 3) {
+                    nextRoundBtn.disabled = true;
+                    if (xScore > oScore) {
+                        finalResult.textContent = 'X has won the game';
+                    } else if (oScore > xScore) {
+                        finalResult.textContent = 'O has won the game';
+                    }
+                    else {
+                        finalResult.textContent = 'The game was a tie!';
+                    }
+                    return;
+                }
             });
         });
     };

@@ -97,6 +97,18 @@ header>h1 {
     cursor: pointer;
 }
 
+#next-round:enabled:active {
+    background-color: rgb(238, 201, 201);
+    color: rgb(48, 38, 38);
+}
+
+#next-round:disabled {
+    cursor: not-allowed;
+    background-color: rgb(199, 199, 199);
+    color: rgb(109, 109, 109);
+    box-shadow: none;
+}
+
 #restart {
     grid-column: 1/-1;
     justify-self: center;
