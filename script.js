@@ -209,6 +209,8 @@ const restartBtn = document.getElementById('restart');
 const xScoreTxt = document.querySelector("div.controls > span > span.x-score > output");
 const oScoreTxt = document.querySelector("div.controls > span > span.o-score > output");
 const finalResult = document.querySelector('div.final-result');
+const xBtn = document.querySelector('.x-score > button');
+const oBtn = document.querySelector('.o-score > button');
 
 nextRoundBtn.addEventListener('click', () => {
     nextRoundBtn.disabled = true;
@@ -225,5 +227,31 @@ restartBtn.addEventListener('click', () => {
     xScoreTxt.textContent = 0;
     oScoreTxt.textContent = 0;
     finalResult.classList.remove('final');
+});
+xBtn.addEventListener('click', () => {
+    while (true) {
+        const name = prompt('Enter your name');
+        if (name.length > 7 || name === null || name.length === 0) {
+            alert('Please put your name below 7 and over 0 character long');
+            continue;
+        }
+        else {
+            xBtn.textContent = 'X(' + name + ')';
+            break;
+        }
+    }
+});
+oBtn.addEventListener('click', () => {
+    while (true) {
+        const name = prompt('Enter your name');
+        if (name.length > 7 || name === null || name.length === 0) {
+            alert('Please put your name below 7 and over 0 character long');
+            continue;
+        }
+        else {
+            oBtn.textContent = 'O(' + name + ')';
+            break;
+        }
+    }
 });
 GameController.startGame();
