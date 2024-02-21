@@ -34,7 +34,8 @@ const GameBoard = (() => {
             console.log(row);
         }
     };
-    return { setXO, setupNewGameState, getCopyOfGameState, X, O, print, getMaxRowNum, getMaxColNum, getCellState };
+    const allCellsAreMarked = () => !gameState.flat().includes(null);
+    return { setXO, setupNewGameState, getCopyOfGameState, X, O, print, getMaxRowNum, getMaxColNum, getCellState, allCellsAreMarked };
 })();
 
 const ScoreChart = (() => {
@@ -50,6 +51,39 @@ const ScoreChart = (() => {
     };
     const print = () => { console.log(`Player 1: ${getPlayer1Wins()}, Player 2: ${getPlayer2Wins()}`) };
     return { getPlayer1Wins, getPlayer2Wins, incrementPlayer1Wins, incrementPlayer2Wins, reset, print };
+})();
+
+const GameBoardView = (() => {
+    const indexToRowNumColNum = (index) => {
+        const maxRowNum = GameBoard.getMaxRowNum();
+        const maxColNum = GameBoard.getMaxColNum();
+        const rowNum = Math.floor(index / (maxRowNum + 1));
+        const colNum = index - (rowNum * (maxColNum + 1));
+        return { rowNum, colNum };
+    };
+
+    const setCellImage = (isX, cell) => {
+        const cellImage = cell.querySelector('img');
+        if (isX) {
+            cellImage.alt = 'X';
+            cellImage.src = 'images/line-md--close.svg';
+        } else {
+            cellImage.alt = 'O';
+            cellImage.src = 'images/mdi--circle-outline.svg';
+        }
+    };
+    const unsetCellImage = (cell) => {
+        const cellImage = cell.querySelector('img');
+        cellImage.alt = '';
+        cellImage.src = '';
+
+    }
+    const reset = () => {
+        const gameBoardElement = document.querySelector('.game-board');
+        const cells = gameBoardElement.querySelectorAll('.cell');
+        cells.forEach(unsetCellImage);
+    }
+    return { indexToRowNumColNum, setCellImage, reset };
 })();
 
 const GameController = (() => {
@@ -107,87 +141,47 @@ const GameController = (() => {
         return rowWin(checkForX) || colWin(checkForX) || diagonalWin(checkForX)
     };
 
-    const diagonalWin = (checkForX) => (leftDiagonalWin(checkForX) || rightDiagonalWin(checkForX));
-    let player1sTurn = true;
-    const isXPlayersTurn = () => player1sTurn;
-    const startGame = () => {
-        ScoreChart.reset();
-        console.log('Starting a new game');
-        let roundNum = 1;
-        while (ScoreChart.getPlayer1Wins() < 3 && ScoreChart.getPlayer2Wins() < 3 && roundNum <= 3) {
-            GameBoard.setupNewGameState();
-            while (!(hasWon(GameBoard.X) || hasWon(GameBoard.O))) {
-                GameBoard.print();
-                if (player1sTurn) {
-                    console.log("Player 1's turn");
-                } else {
-                    console.log("Player 2's turn");
-                }
-                let rowNum = prompt('Enter row number(0 to 2)');
-                let colNum = prompt('Enter column number(0 to 2)');
-                if (!GameBoard.setXO(player1sTurn, rowNum, colNum)) {
-                    console.log('Please enter valid row and column number. Place only on empty cells.');
-                    continue;
-                }
-                player1sTurn = !player1sTurn;
-            }
-            GameBoard.print();
-            if (!player1sTurn) {
-                console.log('Player 1 has won round ' + roundNum);
-                ScoreChart.incrementPlayer1Wins();
-            } else {
-                console.log('Player 2 has won round ' + roundNum);
-                ScoreChart.incrementPlayer2Wins();
-            }
-            ++roundNum;
-        }
-        if (ScoreChart.getPlayer1Wins() > ScoreChart.getPlayer2Wins()) {
-            console.log('Player 1 has won the game');
-        } else if (ScoreChart.getPlayer1Wins() < ScoreChart.getPlayer2Wins()) {
-            console.log('Player 2 has won the game');
-        } else {
-            console.log("It's a tie");
-        }
-        ScoreChart.print();
-    };
-    return { startGame, isXPlayersTurn };
-})();
-
-const GameBoardView = (() => {
     const gameBoardElement = document.querySelector('.game-board');
     const cells = gameBoardElement.querySelectorAll('.cell');
-
-    const indexToRowNumColNum = (index) => {
-        const maxRowNum = GameBoard.getMaxRowNum();
-        const maxColNum = GameBoard.getMaxColNum();
-        const rowNum = Math.floor(index / (maxRowNum + 1));
-        const colNum = index - (rowNum * (maxColNum + 1));
-        return { rowNum, colNum };
-    };
-
-    const setCellImage = (isX, cell) => {
-        const cellImage = cell.querySelector('img');
-        if (isX) {
-            cellImage.alt = 'X';
-            cellImage.src = 'images/line-md--close.svg';
-        } else {
-            cellImage.alt = 'O';
-            cellImage.src = 'images/mdi--circle-outline.svg';
-        }
-    };
+    const diagonalWin = (checkForX) => (leftDiagonalWin(checkForX) || rightDiagonalWin(checkForX));
     const attachEventListenersForEveryCell = () => {
+        let isXPlayersTurn = true;
+        const xScoreTxt = document.querySelector("body > div.controls > span > span.x-score > output");
+        const oScoreTxt = document.querySelector("body > div.controls > span > span.o-score > output");
+        const finalResult = document.querySelector('body>div.final-result');
+        let xScore = 0;
+        let oScore = 0;
         cells.forEach((cell) => {
             cell.addEventListener('click', () => {
-                const { rowNum, colNum } = indexToRowNumColNum(cell.dataset.index);
+                const { rowNum, colNum } = GameBoardView.indexToRowNumColNum(cell.dataset.index);
                 if (GameBoard.getCellState(rowNum, colNum) !== null) return;
-                const isX = GameController.isXPlayersTurn();
-                GameBoard.setXO(isX, rowNum, colNum);
-                setCellImage(isX, cell);
+                GameBoard.setXO(isXPlayersTurn, rowNum, colNum);
+                GameBoardView.setCellImage(isXPlayersTurn, cell);
+                if (hasWon(GameBoard.X)) {
+                    xScoreTxt.textContent = ++xScore;
+                }
+                else if (hasWon(GameBoard.O)) {
+                    oScoreTxt.textContent = ++oScore;
+                }
+                if (hasWon(GameBoard.X) || hasWon(GameBoard.O) || GameBoard.allCellsAreMarked()) {
+                    GameBoardView.reset();
+                    GameBoard.setupNewGameState();
+                }
+                if (GameBoard.allCellsAreMarked()) {
+                    console.log('all marked');
+                    finalResult.textContent = 'Last round was a tie';
+                }
+                isXPlayersTurn = !isXPlayersTurn;
             });
         });
     };
-    return { attachEventListenersForEveryCell };
+    const startGame = () => {
+        ScoreChart.reset();
+        GameBoard.setupNewGameState();
+        attachEventListenersForEveryCell();
+        console.log('Starting a new game');
+    };
+    return { startGame };
 })();
 
-GameBoard.setupNewGameState();
-GameBoardView.attachEventListenersForEveryCell();
+GameController.startGame();
