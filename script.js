@@ -206,9 +206,9 @@ const GameController = (() => {
 })();
 const nextRoundBtn = document.getElementById('next-round');
 const restartBtn = document.getElementById('restart');
-const xScoreTxt = document.querySelector("body > div.controls > span > span.x-score > output");
-const oScoreTxt = document.querySelector("body > div.controls > span > span.o-score > output");
-const finalResult = document.querySelector('body>div.final-result');
+const xScoreTxt = document.querySelector("div.controls > span > span.x-score > output");
+const oScoreTxt = document.querySelector("div.controls > span > span.o-score > output");
+const finalResult = document.querySelector('div.final-result');
 
 nextRoundBtn.addEventListener('click', () => {
     nextRoundBtn.disabled = true;
