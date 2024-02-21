@@ -122,6 +122,11 @@ header>h1 {
     cursor: pointer;
 }
 
+#restart:active {
+    background-color: rgb(126, 16, 52);
+    color: rgb(190, 190, 190);
+}
+
 .final-result {
     text-align: center;
     font-size: 1.2rem;

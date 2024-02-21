@@ -146,7 +146,6 @@ const GameController = (() => {
     const diagonalWin = (checkForX) => (leftDiagonalWin(checkForX) || rightDiagonalWin(checkForX));
     let haltGame = false;
     let numOfCompletedRounds = 0;
-    const getNumOfRoundsCompleted = () => numOfCompletedRounds;
     const setHaltGame = (halt) => { haltGame = halt; };
     const attachEventListenersForEveryCell = () => {
         let isXPlayersTurn = true;
@@ -175,6 +174,7 @@ const GameController = (() => {
                 if (xWon || oWon || GameBoard.allCellsAreMarked()) {
                     ++numOfCompletedRounds;
                     haltGame = true;
+                    nextRoundBtn.disabled = false;
                 }
                 if (numOfCompletedRounds === 3) {
                     nextRoundBtn.disabled = true;
@@ -211,6 +211,7 @@ const oScoreTxt = document.querySelector("body > div.controls > span > span.o-sc
 const finalResult = document.querySelector('body>div.final-result');
 
 nextRoundBtn.addEventListener('click', () => {
+    nextRoundBtn.disabled = true;
     GameController.setHaltGame(false);
     GameBoardView.reset();
     GameBoard.setupNewGameState();
