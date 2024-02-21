@@ -19,6 +19,7 @@ const GameBoard = (() => {
         gameState = Array.from({ length: 3 }, () => Array.from({ length: 3 }, () => null));
     };
     const getCopyOfGameState = () => gameState.map(row => row.slice());
+    const getCellState = (rowNum, colNum) => gameState[rowNum][colNum];
     const print = () => {
         console.log('\t0\t1\t2')
         for (let i = 0; i < 3; ++i) {
@@ -32,8 +33,8 @@ const GameBoard = (() => {
             }
             console.log(row);
         }
-    }
-    return { setXO, setupNewGameState, getCopyOfGameState, X, O, print, getMaxRowNum, getMaxColNum };
+    };
+    return { setXO, setupNewGameState, getCopyOfGameState, X, O, print, getMaxRowNum, getMaxColNum, getCellState };
 })();
 
 const ScoreChart = (() => {
@@ -175,11 +176,10 @@ const GameBoardView = (() => {
         }
     };
     const attachEventListenersForEveryCell = () => {
-        const gameState = GameBoard.getCopyOfGameState();
         cells.forEach((cell) => {
             cell.addEventListener('click', () => {
                 const { rowNum, colNum } = indexToRowNumColNum(cell.dataset.index);
-                if (gameState[rowNum][colNum] !== null) return;
+                if (GameBoard.getCellState(rowNum, colNum) !== null) return;
                 const isX = GameController.isXPlayersTurn();
                 GameBoard.setXO(isX, rowNum, colNum);
                 setCellImage(isX, cell);
