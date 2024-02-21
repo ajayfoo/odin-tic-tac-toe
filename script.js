@@ -2,9 +2,14 @@ const GameBoard = (() => {
     let gameState = null;
     const X = 'X';
     const O = 'O';
+    const getMaxRowNum = () => {
+        if (gameState !== null) return gameState.length - 1;
+        else return -1;
+    };
+    const getMaxColNum = () => getMaxRowNum();
     const setXO = (setX, row, col) => {
-        const maxRow = gameState.length - 1;
-        const maxCol = maxRow;
+        const maxRow = getMaxRowNum();
+        const maxCol = getMaxColNum();
         if (row > maxRow || row < 0 || col > maxCol || col < 0) return false;
         if (gameState[row][col] !== null) return false;
         gameState[row][col] = setX ? X : O;
@@ -28,7 +33,7 @@ const GameBoard = (() => {
             console.log(row);
         }
     }
-    return { setXO, setupNewGameState, getCopyOfGameState, X, O, print };
+    return { setXO, setupNewGameState, getCopyOfGameState, X, O, print, getMaxRowNum, getMaxColNum };
 })();
 
 const ScoreChart = (() => {
@@ -102,11 +107,12 @@ const GameController = (() => {
     };
 
     const diagonalWin = (checkForX) => (leftDiagonalWin(checkForX) || rightDiagonalWin(checkForX));
+    let player1sTurn = true;
+    const isXPlayersTurn = () => player1sTurn;
     const startGame = () => {
         ScoreChart.reset();
         console.log('Starting a new game');
         let roundNum = 1;
-        let player1sTurn = true;
         while (ScoreChart.getPlayer1Wins() < 3 && ScoreChart.getPlayer2Wins() < 3 && roundNum <= 3) {
             GameBoard.setupNewGameState();
             while (!(hasWon(GameBoard.X) || hasWon(GameBoard.O))) {
@@ -143,11 +149,23 @@ const GameController = (() => {
         }
         ScoreChart.print();
     };
-    return { startGame };
+    return { startGame, isXPlayersTurn };
 })();
 
 const GameBoardView = (() => {
-    const setCellImage = (isX, cellImage) => {
+    const gameBoardElement = document.querySelector('.game-board');
+    const cells = gameBoardElement.querySelectorAll('.cell');
+
+    const indexToRowNumColNum = (index) => {
+        const maxRowNum = GameBoard.getMaxRowNum();
+        const maxColNum = GameBoard.getMaxColNum();
+        const rowNum = Math.floor(index / (maxRowNum + 1));
+        const colNum = index - (rowNum * (maxColNum + 1));
+        return { rowNum, colNum };
+    };
+
+    const setCellImage = (isX, cell) => {
+        const cellImage = cell.querySelector('img');
         if (isX) {
             cellImage.alt = 'X';
             cellImage.src = 'images/line-md--close.svg';
@@ -156,22 +174,20 @@ const GameBoardView = (() => {
             cellImage.src = 'images/mdi--circle-outline.svg';
         }
     };
-    const populate = () => {
-        GameBoard.setupNewGameState();
-        GameBoard.setXO(true, 0, 0);
+    const attachEventListenersForEveryCell = () => {
         const gameState = GameBoard.getCopyOfGameState();
-        const gameBoardElement = document.querySelector('.game-board');
-        const cells = gameBoardElement.querySelectorAll('.cell');
-        let cellIndex = 0;
-        for (let i = 0; i < gameState.length; ++i) {
-            for (let j = 0; j < gameState.length; ++j, ++cellIndex) {
-                const isX = gameState[i][j] === 'X';
-                const cellImage = cells[cellIndex].querySelector('img');
-                setCellImage(isX, cellImage);
-            }
-        }
+        cells.forEach((cell) => {
+            cell.addEventListener('click', () => {
+                const { rowNum, colNum } = indexToRowNumColNum(cell.dataset.index);
+                if (gameState[rowNum][colNum] !== null) return;
+                const isX = GameController.isXPlayersTurn();
+                GameBoard.setXO(isX, rowNum, colNum);
+                setCellImage(isX, cell);
+            });
+        });
     };
-    return { populate };
+    return { attachEventListenersForEveryCell };
 })();
 
-GameBoardView.populate();
+GameBoard.setupNewGameState();
+GameBoardView.attachEventListenersForEveryCell();
