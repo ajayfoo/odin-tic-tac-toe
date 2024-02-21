@@ -21,7 +21,7 @@ header>h1 {
     width: min-content;
     grid-template-columns: repeat(3, 100px);
     grid-template-rows: repeat(3, 100px);
-    gap: 15px;
+    gap: 5px;
     justify-content: center;
     margin: 0 auto;
     background-color: rgb(182 23 75);
@@ -30,6 +30,7 @@ header>h1 {
 
 .cell {
     background-color: rgb(242 190 252);
+    padding: 0.75em;
 }
 
 .cell>img {
